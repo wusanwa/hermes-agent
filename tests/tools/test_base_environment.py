@@ -199,28 +199,30 @@ class TestCwdMarker:
 
 
 class TestSessionEnvForwarding:
-    def test_base_environment_includes_session_env(self):
+    def test_base_environment_includes_minimal_session_env(self):
         with patch.dict(
             os.environ,
             {
                 "HERMES_SESSION_KEY": "agent:main:dingtalk:dm:cid123",
                 "HERMES_SESSION_PLATFORM": "dingtalk",
                 "HERMES_SESSION_CHAT_ID": "cid123",
+                "HERMES_SESSION_ID": "session-123",
             },
             clear=False,
         ):
             env = _TestableEnv()
 
-        assert env.env["HERMES_SESSION_KEY"] == "agent:main:dingtalk:dm:cid123"
-        assert env.env["HERMES_SESSION_PLATFORM"] == "dingtalk"
-        assert env.env["HERMES_SESSION_CHAT_ID"] == "cid123"
+        assert env.env["HERMES_SESSION_ID"] == "session-123"
+        assert "HERMES_SESSION_KEY" not in env.env
+        assert "HERMES_SESSION_PLATFORM" not in env.env
+        assert "HERMES_SESSION_CHAT_ID" not in env.env
 
     def test_base_environment_builds_cli_binding_key_when_no_session_key(self):
         with patch.dict(
             os.environ,
-            {"HERMES_HOME": "/tmp/hermes-test-home"},
+            {},
             clear=True,
         ):
             env = _TestableEnv()
 
-        assert env.env["HERMES_BINDING_KEY"].startswith("hermes:cli:")
+        assert env.env["HERMES_BINDING_KEY"].startswith("hermes:cwd:")

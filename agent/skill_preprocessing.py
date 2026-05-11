@@ -9,12 +9,12 @@ logger = logging.getLogger(__name__)
 
 from agent.session_identity import resolve_binding_key
 
-# Matches ${HERMES_SKILL_DIR} / ${HERMES_SESSION_ID} / ${HERMES_SESSION_KEY}
-# / ${HERMES_BINDING_KEY} tokens in SKILL.md. Tokens that don't resolve (e.g.
+# Matches ${HERMES_SKILL_DIR} / ${HERMES_SESSION_ID} / ${HERMES_BINDING_KEY}
+# tokens in SKILL.md. Tokens that don't resolve (e.g.
 # ${HERMES_SESSION_ID} with no session) are
 # left as-is so the user can debug them.
 _SKILL_TEMPLATE_RE = re.compile(
-    r"\$\{(HERMES_SKILL_DIR|HERMES_SESSION_ID|HERMES_SESSION_KEY|HERMES_BINDING_KEY)\}"
+    r"\$\{(HERMES_SKILL_DIR|HERMES_SESSION_ID|HERMES_BINDING_KEY)\}"
 )
 
 # Matches inline shell snippets like:  !`date +%Y-%m-%d`
@@ -75,8 +75,6 @@ def substitute_template_vars(
             return skill_dir_str
         if token == "HERMES_SESSION_ID" and session_id:
             return str(session_id)
-        if token == "HERMES_SESSION_KEY" and resolved_session_key:
-            return str(resolved_session_key)
         if token == "HERMES_BINDING_KEY" and resolved_binding_key:
             return str(resolved_binding_key)
         return match.group(0)

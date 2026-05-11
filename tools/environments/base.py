@@ -95,15 +95,8 @@ def get_sandbox_dir() -> Path:
 
 
 def _collect_session_env() -> dict[str, str]:
-    """Return generic Hermes session metadata to expose to subprocesses."""
+    """Return the minimal session metadata to expose to subprocesses."""
     names = (
-        "HERMES_SESSION_PLATFORM",
-        "HERMES_SESSION_CHAT_ID",
-        "HERMES_SESSION_CHAT_NAME",
-        "HERMES_SESSION_THREAD_ID",
-        "HERMES_SESSION_USER_ID",
-        "HERMES_SESSION_USER_NAME",
-        "HERMES_SESSION_KEY",
         "HERMES_SESSION_ID",
         "HERMES_BINDING_KEY",
     )
@@ -125,7 +118,7 @@ def _collect_session_env() -> dict[str, str]:
             values[name] = value
     binding_key = resolve_binding_key(
         session_id=values.get("HERMES_SESSION_ID", ""),
-        session_key=values.get("HERMES_SESSION_KEY", ""),
+        session_key=None,
     )
     if binding_key:
         values["HERMES_BINDING_KEY"] = binding_key
@@ -141,13 +134,6 @@ def _wrap_command_with_session_env(command: str, env_values: dict[str, str]) -> 
     commands observe fresh binding/session values.
     """
     names = (
-        "HERMES_SESSION_PLATFORM",
-        "HERMES_SESSION_CHAT_ID",
-        "HERMES_SESSION_CHAT_NAME",
-        "HERMES_SESSION_THREAD_ID",
-        "HERMES_SESSION_USER_ID",
-        "HERMES_SESSION_USER_NAME",
-        "HERMES_SESSION_KEY",
         "HERMES_SESSION_ID",
         "HERMES_BINDING_KEY",
     )

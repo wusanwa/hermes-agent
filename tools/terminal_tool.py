@@ -1845,8 +1845,6 @@ def terminal_tool(
 
         if hasattr(env, "env"):
             env.env["HERMES_SESSION_ID"] = raw_session_id or effective_task_id
-            if current_session_key:
-                env.env["HERMES_SESSION_KEY"] = current_session_key
             if current_binding_key:
                 env.env["HERMES_BINDING_KEY"] = current_binding_key
 

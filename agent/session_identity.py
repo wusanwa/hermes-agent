@@ -42,6 +42,13 @@ def _redacted_binding(label: str, raw_value: str | None) -> str:
 
 
 def _persistent_cli_identity() -> str:
+    if _normalize_text(os.getenv("HERMES_PERSISTENT_CLI_BINDING")).lower() not in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }:
+        return ""
     state_dir = _hermes_home() / "state"
     identity_file = state_dir / "cli_binding_key"
     try:
@@ -83,7 +90,7 @@ def resolve_binding_key(
     1. Explicit ``HERMES_BINDING_KEY`` (already-final override)
     2. Provided ``session_key`` or gateway session key
     3. Explicit ``HERMES_CLI_BINDING_KEY`` (classic CLI override)
-    4. Persistent machine-local CLI identity
+    4. Persistent machine-local CLI identity when explicitly enabled
     5. Deterministic per-working-directory CLI key
 
     ``session_id`` is intentionally not used as a binding source because it is

@@ -614,7 +614,7 @@ class TestSkillDirectoryHeader:
 
 class TestTemplateVarSubstitution:
     """``${HERMES_SKILL_DIR}``, ``${HERMES_SESSION_ID}``,
-    ``${HERMES_SESSION_KEY}``, and ``${HERMES_BINDING_KEY}`` in SKILL.md body
+    and ``${HERMES_BINDING_KEY}`` in SKILL.md body
     are replaced before the agent sees the content."""
 
     def test_substitutes_skill_dir(self, tmp_path):
@@ -661,34 +661,18 @@ class TestTemplateVarSubstitution:
         # No session — token left intact so the author can spot it.
         assert "Session: ${HERMES_SESSION_ID}" in msg
 
-    def test_substitutes_session_key_when_available(self, tmp_path):
+    def test_leaves_session_key_token_unresolved(self, tmp_path):
         with (
             patch("tools.skills_tool.SKILLS_DIR", tmp_path),
             patch.dict(os.environ, {"HERMES_SESSION_KEY": "agent:main:dingtalk:dm:abc"}, clear=False),
         ):
             _make_skill(
                 tmp_path,
-                "session-key-templated",
+                "session-key-literal",
                 body="Session key: ${HERMES_SESSION_KEY}",
             )
             scan_skill_commands()
-            msg = build_skill_invocation_message("/session-key-templated", task_id="abc-123")
-
-        assert msg is not None
-        assert "Session key: agent:main:dingtalk:dm:abc" in msg
-
-    def test_leaves_session_key_token_when_missing(self, tmp_path):
-        with (
-            patch("tools.skills_tool.SKILLS_DIR", tmp_path),
-            patch.dict(os.environ, {}, clear=True),
-        ):
-            _make_skill(
-                tmp_path,
-                "session-key-missing",
-                body="Session key: ${HERMES_SESSION_KEY}",
-            )
-            scan_skill_commands()
-            msg = build_skill_invocation_message("/session-key-missing", task_id=None)
+            msg = build_skill_invocation_message("/session-key-literal", task_id="abc-123")
 
         assert msg is not None
         assert "Session key: ${HERMES_SESSION_KEY}" in msg
@@ -720,7 +704,6 @@ class TestTemplateVarSubstitution:
         with (
             patch("tools.skills_tool.SKILLS_DIR", tmp_path),
             patch.dict(os.environ, {}, clear=True),
-            patch("agent.session_identity._persistent_cli_identity", return_value=""),
         ):
             _make_skill(
                 tmp_path,
